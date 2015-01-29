@@ -644,8 +644,7 @@ ifeq ($(strip $(DEBUG_BIONIC_LIBC)),true)
   libc_common_cflags += -DDEBUG
 endif
 
-libc_malloc_src := bionic/jemalloc_wrapper.cpp
-libc_common_c_includes += external/jemalloc/include
+libc_malloc_src := bionic/omalloc.c
 
 # Define some common conlyflags
 libc_common_conlyflags := \
@@ -1213,7 +1212,6 @@ LOCAL_WHOLE_STATIC_LIBRARIES := \
     libc_syscalls \
     libc_tzcode \
     libm \
-    libjemalloc \
 
 LOCAL_WHOLE_STATIC_LIBRARIES_arm := libc_aeabi
 LOCAL_CXX_STL := none
@@ -1348,7 +1346,7 @@ LOCAL_C_INCLUDES := $(libc_common_c_includes)
 LOCAL_MODULE := libc
 LOCAL_CLANG := $(use_clang)
 LOCAL_ADDITIONAL_DEPENDENCIES := $(libc_common_additional_dependencies)
-LOCAL_WHOLE_STATIC_LIBRARIES := libc_common libc_init_static libjemalloc
+LOCAL_WHOLE_STATIC_LIBRARIES := libc_common libc_init_static
 
 LOCAL_CXX_STL := none
 LOCAL_SYSTEM_SHARED_LIBRARIES :=
@@ -1410,7 +1408,7 @@ LOCAL_PACK_MODULE_RELOCATIONS := false
 # you wanted!
 
 LOCAL_SHARED_LIBRARIES := libdl
-LOCAL_WHOLE_STATIC_LIBRARIES := libc_common libjemalloc
+LOCAL_WHOLE_STATIC_LIBRARIES := libc_common
 
 LOCAL_CXX_STL := none
 LOCAL_SYSTEM_SHARED_LIBRARIES :=
