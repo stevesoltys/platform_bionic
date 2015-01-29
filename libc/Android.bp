@@ -58,7 +58,6 @@ cc_defaults {
     asflags: libc_common_flags,
     conlyflags: ["-std=gnu99"],
     cppflags: [],
-    include_dirs: ["external/jemalloc/include"],
 
     stl: "none",
     system_shared_libs: [],
@@ -1570,7 +1569,6 @@ cc_library_static {
         "libc_syscalls",
         "libc_tzcode",
         "libm",
-        "libjemalloc",
         "libstdc++",
     ],
 }
@@ -1649,7 +1647,7 @@ cc_library_static {
 // ========================================================
 cc_library_static {
     defaults: ["libc_defaults"],
-    srcs: ["bionic/jemalloc_wrapper.cpp"],
+    srcs: ["bionic/omalloc.c"],
     cflags: ["-fvisibility=hidden"],
 
     name: "libc_malloc",
@@ -1674,7 +1672,7 @@ cc_library {
             "bionic/libc_init_static.cpp",
         ],
         cflags: ["-DLIBC_STATIC"],
-        whole_static_libs: ["libc_init_static", "libjemalloc"],
+        whole_static_libs: ["libc_init_static"],
     },
     shared: {
         srcs: [
@@ -1686,7 +1684,6 @@ cc_library {
             "bionic/NetdClient.cpp",
             "arch-common/bionic/crtend_so.S",
         ],
-        whole_static_libs: ["libjemalloc"],
     },
 
     required: ["tzdata"],
