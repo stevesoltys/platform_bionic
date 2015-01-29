@@ -99,7 +99,6 @@ cc_defaults {
     ],
     conlyflags: ["-std=gnu99"],
     cppflags: [],
-    include_dirs: ["external/jemalloc/include"],
 
     arch: {
         // Clang/llvm has incompatible long double (fp128) for x86_64.
@@ -1603,7 +1602,6 @@ cc_library_static {
         "libc_syscalls",
         "libc_tzcode",
         "libm",
-        "libjemalloc",
     ],
 }
 
@@ -1682,7 +1680,7 @@ cc_library_static {
 // ========================================================
 cc_library_static {
     defaults: ["libc_defaults"],
-    srcs: ["bionic/jemalloc_wrapper.cpp"],
+    srcs: ["bionic/omalloc.c"],
     cflags: ["-fvisibility=hidden"],
 
     name: "libc_malloc",
@@ -1733,7 +1731,7 @@ cc_library {
     // you wanted!
 
     shared_libs: ["libdl"],
-    whole_static_libs: ["libc_common", "libjemalloc"],
+    whole_static_libs: ["libc_common"],
 
     // We'd really like to do this for all architectures, but since this wasn't done
     // before, these symbols must continue to be exported on LP32 for binary
