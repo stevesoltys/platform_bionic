@@ -51,6 +51,8 @@ extern void*  memmove(void *, const void *, size_t);
 extern void*  memset(void *, int, size_t);
 extern void*  memmem(const void *, size_t, const void *, size_t) __purefunc;
 
+extern void*  explicit_memset(void *s, int c, size_t n);
+
 extern char*  strchr(const char *, int) __purefunc;
 extern char* __strchr_chk(const char *, int, size_t);
 #if defined(__USE_GNU)
@@ -262,6 +264,13 @@ char *strncat(char* __restrict dest, const char* __restrict src, size_t n) {
 __BIONIC_FORTIFY_INLINE
 void* memset(void *s, int c, size_t n) {
     return __builtin___memset_chk(s, c, n, __bos0(s));
+}
+
+__BIONIC_FORTIFY_INLINE
+void* explicit_memset(void *s, int c, size_t n) {
+    void *ptr = __builtin___memset_chk(s, c, n, __bos0(s));
+    __asm__ __volatile__("" : : "r"(ptr) : "memory");
+    return ptr;
 }
 
 __BIONIC_FORTIFY_INLINE
