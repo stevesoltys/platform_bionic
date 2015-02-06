@@ -41,6 +41,7 @@ endif
 libc_common_src_files := \
     bionic/ether_aton.c \
     bionic/ether_ntoa.c \
+    bionic/explicit_memset.c \
     bionic/fts.c \
     bionic/getpriority.c \
     bionic/initgroups.c \
