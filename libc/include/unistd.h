@@ -204,9 +204,9 @@ extern int usleep(useconds_t __usec);
 int gethostname(char* __name, size_t __len);
 int sethostname(const char* __name, size_t __len);
 
-extern void* __brk(void* __addr);
-extern int brk(void* __addr);
-extern void* sbrk(ptrdiff_t __increment);
+extern void* __brk(void* __addr) __warnattr("__brk is obsolete; use mmap instead");
+extern int brk(void* __addr) __warnattr("brk is obsolete; use mmap instead");
+extern void* sbrk(ptrdiff_t __increment) __warnattr("sbrk is obsolete; use mmap instead");
 
 extern int getopt(int __argc, char* const* __argv, const char* __argstring);
 extern char* optarg;
