@@ -22,6 +22,7 @@
 
 #define	_POSIX_C_SOURCE	199309L
 #define	_GNU_SOURCE	1
+#define	HAVE_GETAUXVAL
 #include <sys/cdefs.h>
 #include <sys/types.h>
 #include <sys/param.h>
