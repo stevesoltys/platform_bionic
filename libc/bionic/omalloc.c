@@ -647,10 +647,39 @@ omalloc_parseopt(char opt)
 }
 
 static void
+pre_fork(void)
+{
+	int i;
+	for (i = 0; i < _MALLOC_MUTEXES; i++)
+		_MALLOC_LOCK(i);
+}
+
+static void
+post_fork_parent(void)
+{
+	int i;
+	for (i = 0; i < _MALLOC_MUTEXES; i++)
+		_MALLOC_UNLOCK(i);
+}
+
+static void
+post_fork_child(void)
+{
+	int i, rc;
+	for (i = 0; i < _MALLOC_MUTEXES; i++) {
+		rc = pthread_mutex_init(&_malloc_lock[i], NULL);
+		if (rc)
+			__libc_fatal("pthread_mutex_init: %s", strerror(rc));
+	}
+}
+
+static void
 omalloc_init(void)
 {
 	char *p, *q, b[64];
 	int i, j;
+
+	pthread_atfork(&pre_fork, &post_fork_parent, &post_fork_child);
 
 	/*
 	 * Default options
