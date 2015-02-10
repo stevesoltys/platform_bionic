@@ -63,6 +63,8 @@ libc_common_src_files := \
     stdlib/atexit.c \
     stdlib/exit.c \
 
+libc_common_src_files += bionic/md5.c
+
 # Fortify implementations of libc functions.
 libc_common_src_files += \
     bionic/__FD_chk.cpp \
