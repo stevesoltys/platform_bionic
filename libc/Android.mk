@@ -195,6 +195,7 @@ libc_bionic_ndk_src_files := \
     bionic/scandir.cpp \
     bionic/sched_getaffinity.cpp \
     bionic/sched_getcpu.cpp \
+    bionic/secure_getenv.cpp \
     bionic/semaphore.cpp \
     bionic/send.cpp \
     bionic/setegid.cpp \
