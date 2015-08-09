@@ -78,6 +78,12 @@ static pthread_mutex_t _malloc_lock = PTHREAD_MUTEX_INITIALIZER;
 #define MALLOC_PAGESHIFT	(12U)
 #endif
 
+#ifdef __LP64__
+#define MAX_GUARD_COUNT (1024 * 1024 * 1024 / PAGE_SIZE)
+#else
+#define MAX_GUARD_COUNT (1024 * 1024 / PAGE_SIZE)
+#endif
+
 #define MALLOC_MINSHIFT		4
 #define MALLOC_MAXSHIFT		(MALLOC_PAGESHIFT - 1)
 #define MALLOC_PAGESIZE		(1UL << MALLOC_PAGESHIFT)
@@ -601,7 +607,7 @@ omalloc_init(struct dir_info **dp)
 {
 	char *p, *q, b[64];
 	int i, j;
-	size_t d_avail, regioninfo_size;
+	size_t d_avail, regioninfo_size, guard_low, guard_high;
 	struct dir_info *d;
 
 	/*
@@ -666,27 +672,30 @@ omalloc_init(struct dir_info **dp)
 	arc4random_buf(&mopts.malloc_chunk_canary,
 	    sizeof(mopts.malloc_chunk_canary));
 
+	guard_low = (arc4random_uniform(MAX_GUARD_COUNT - 1) + 1) * PAGE_SIZE;
+	guard_high = (arc4random_uniform(MAX_GUARD_COUNT - 1) + 1) * PAGE_SIZE;
+
 	/*
-	 * Allocate dir_info with a guard page on either side. Also
+	 * Allocate dir_info with a guard region on either side. Also
 	 * randomise offset inside the page at which the dir_info
 	 * lies (subject to alignment by 1 << MALLOC_MINSHIFT)
 	 */
-	if ((p = MMAP(DIR_INFO_RSZ + (MALLOC_PAGESIZE * 2))) == MAP_FAILED)
+	if ((p = MMAP(DIR_INFO_RSZ + guard_low + guard_high)) == MAP_FAILED)
 		return -1;
-	mprotect(p, MALLOC_PAGESIZE, PROT_NONE);
-	mprotect(p + MALLOC_PAGESIZE + DIR_INFO_RSZ,
-	    MALLOC_PAGESIZE, PROT_NONE);
+	mprotect(p, guard_low, PROT_NONE);
+	mprotect(p + guard_low + DIR_INFO_RSZ,
+	    guard_high, PROT_NONE);
 	d_avail = (DIR_INFO_RSZ - sizeof(*d)) / alignof(struct dir_info);
-	d = (struct dir_info *)(p + MALLOC_PAGESIZE +
+	d = (struct dir_info *)(p + guard_low +
 	    (arc4random_uniform(d_avail) * alignof(struct dir_info)));
 
-	prctl(PR_SET_VMA, PR_SET_VMA_ANON_NAME, p, MALLOC_PAGESIZE,
-	    "malloc dir_info guard page");
-	prctl(PR_SET_VMA, PR_SET_VMA_ANON_NAME, p + MALLOC_PAGESIZE,
+	prctl(PR_SET_VMA, PR_SET_VMA_ANON_NAME, p, guard_low,
+	    "malloc dir_info guard region");
+	prctl(PR_SET_VMA, PR_SET_VMA_ANON_NAME, p + guard_low,
 	    DIR_INFO_RSZ, "malloc dir_info");
 	prctl(PR_SET_VMA, PR_SET_VMA_ANON_NAME,
-	    p + MALLOC_PAGESIZE + DIR_INFO_RSZ, MALLOC_PAGESIZE,
-	    "malloc dir_info guard page");
+	    p + guard_low + DIR_INFO_RSZ, guard_high,
+	    "malloc dir_info guard region");
 
 	rbytes_init(d);
 	d->regions_free = d->regions_total = MALLOC_INITIAL_REGIONS;
