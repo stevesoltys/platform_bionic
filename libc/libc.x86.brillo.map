@@ -157,6 +157,7 @@ LIBC {
     __sched_cpucount;
     __sched_cpufree;
     __sched_getaffinity; # arm x86 mips
+    __sendto_chk;
     __set_thread_area; # x86
     __set_tid_address; # arm x86 mips
     __sF;
