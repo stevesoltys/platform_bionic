@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 The Android Open Source Project
+ * Copyright (C) 2015 The Android Open Source Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,8 +27,17 @@
  */
 
 #undef _FORTIFY_SOURCE
-#include <sys/socket.h>
 
-ssize_t send(int socket, const void* buf, size_t len, int flags) {
-  return sendto(socket, buf, len, flags, NULL, 0);
+#include <stddef.h>
+#include <sys/socket.h>
+#include "private/libc_logging.h"
+
+ssize_t __sendto_chk(int socket, const void* buf, size_t len, size_t buflen,
+                     int flags, const struct sockaddr* dest_addr,
+                     socklen_t addrlen) {
+  if (__predict_false(len > buflen)) {
+    __fortify_chk_fail("sendto: prevented read past end of buffer", 0);
+  }
+
+  return sendto(socket, buf, len, flags, dest_addr, addrlen);
 }
