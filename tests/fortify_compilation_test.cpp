@@ -188,6 +188,16 @@ void test_recvfrom() {
   recvfrom(0, buf, 6, 0, reinterpret_cast<sockaddr*>(&addr), NULL);
 }
 
+void test_sendto() {
+  char buf[4] = {0};
+  sockaddr_in addr;
+
+  // NOLINTNEXTLINE(whitespace/line_length)
+  // GCC: error: call to '__sendto_error' declared with attribute error: sendto called with size bigger than buffer
+  // clang should emit a warning, but doesn't
+  sendto(0, buf, 6, 0, reinterpret_cast<sockaddr*>(&addr), sizeof(sockaddr_in));
+}
+
 void test_umask() {
   // NOLINTNEXTLINE(whitespace/line_length)
   // GCC: error: call to '__umask_invalid_mode' declared with attribute error: umask called with invalid mode
