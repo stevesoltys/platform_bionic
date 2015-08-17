@@ -82,6 +82,7 @@ libc_common_src_files += \
     bionic/__readlink_chk.cpp \
     bionic/__readlinkat_chk.cpp \
     bionic/__recvfrom_chk.cpp \
+    bionic/__sendto_chk.cpp \
     bionic/__stpcpy_chk.cpp \
     bionic/__stpncpy_chk.cpp \
     bionic/__strchr_chk.cpp \
