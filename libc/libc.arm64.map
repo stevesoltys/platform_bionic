@@ -109,6 +109,7 @@ LIBC {
     __sched_cpualloc;
     __sched_cpucount;
     __sched_cpufree;
+    __sendto_chk;
     __sF;
     __snprintf_chk;
     __sprintf_chk;
