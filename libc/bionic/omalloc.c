@@ -591,7 +591,7 @@ omalloc_parseopt(char opt)
 		mopts.malloc_move = 0;
 		break;
 	case 'P':
-		mopts.malloc_move = 1;
+		mopts.malloc_move = 2;
 		break;
 	case 'r':
 		mopts.malloc_realloc = 0;
@@ -673,6 +673,9 @@ omalloc_init(void)
 			}
 		}
 	}
+
+	if (mopts.malloc_move == 1 && !mopts.malloc_guard)
+		mopts.malloc_move = 0;
 
 #ifdef MALLOC_STATS
 	if (mopts.malloc_stats && (atexit(malloc_exit) == -1)) {
