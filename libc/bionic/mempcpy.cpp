@@ -26,6 +26,7 @@
  * SUCH DAMAGE.
  */
 
+#undef _FORTIFY_SOURCE
 #include <string.h>
 
 void* mempcpy(void* dst, const void* src, size_t n) {
