@@ -255,6 +255,13 @@ void* memcpy(void* __restrict dest, const void* __restrict src, size_t copy_amou
     return __builtin___memcpy_chk(dest, src, copy_amount, __bos0(dest));
 }
 
+#if defined(__USE_GNU)
+__BIONIC_FORTIFY_INLINE
+void* mempcpy(void* __restrict dest, const void* __restrict src, size_t n) {
+    return (char *)memcpy(dest, src, n) + n;
+}
+#endif
+
 __BIONIC_FORTIFY_INLINE
 void* memmove(void *dest, const void *src, size_t len) {
     return __builtin___memmove_chk(dest, src, len, __bos0(dest));
