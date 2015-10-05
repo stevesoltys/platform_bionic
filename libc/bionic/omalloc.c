@@ -50,6 +50,7 @@
 #include "omalloc.h"
 #include "private/bionic_config.h"
 #include "private/bionic_prctl.h"
+#include "private/libc_logging.h"
 
 extern char *__progname;
 
@@ -332,7 +333,7 @@ wrterror(struct dir_info *d, char *msg, void *p)
 
 	errno = saved_errno;
 
-	abort();
+	__libc_fatal("%s %s %p", d->func, msg, p);
 }
 
 static void
