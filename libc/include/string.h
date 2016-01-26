@@ -142,6 +142,10 @@ extern int __memcmp_chk(const void*, const void*, size_t, size_t, size_t);
 __errordecl(__memcmp_buf_size_error, "memcmp called with size bigger than buffer");
 extern int __memcmp_real(const void*, const void*, size_t) __RENAME(memcmp);
 
+extern void* __memmem_chk(const void *, size_t, size_t, const void *, size_t, size_t);
+__errordecl(__memmem_buf_size_error, "memmem called with size bigger than buffer");
+extern void* __memmem_real(const void *, size_t, const void *, size_t) __RENAME(memmem);
+
 extern char* __stpncpy_chk2(char* __restrict, const char* __restrict, size_t, size_t, size_t);
 extern char* __strncpy_chk2(char* __restrict, const char* __restrict, size_t, size_t, size_t);
 extern size_t __strlcpy_real(char* __restrict, const char* __restrict, size_t) __RENAME(strlcpy);
@@ -217,6 +221,33 @@ int memcmp(const void* a, const void* b, size_t n) {
 #endif
 
     return __memcmp_chk(a, b, n, bos_a, bos_b);
+}
+
+__BIONIC_FORTIFY_INLINE
+void* memmem(const void* haystack, size_t haystacklen, const void* needle, size_t needlelen) {
+    size_t bos_haystack = __bos0(haystack);
+    size_t bos_needle = __bos0(needle);
+
+#if !defined(__clang__)
+    if (bos_haystack == __BIONIC_FORTIFY_UNKNOWN_SIZE && bos_needle == __BIONIC_FORTIFY_UNKNOWN_SIZE) {
+        return __memmem_real(haystack, haystacklen, needle, needlelen);
+    }
+
+    if (__builtin_constant_p(haystacklen) && haystacklen > bos_haystack) {
+        __memmem_buf_size_error();
+    }
+
+    if (__builtin_constant_p(needlelen) && needlelen > bos_needle) {
+        __memmem_buf_size_error();
+    }
+
+    if ((__builtin_constant_p(haystacklen) && haystacklen <= bos_haystack &&
+         __builtin_constant_p(needlelen) && needlelen <= bos_needle)) {
+        return __memmem_real(haystack, haystacklen, needle, needlelen);
+    }
+#endif
+
+    return __memmem_chk(haystack, haystacklen, bos_haystack, needle, needlelen, bos_needle);
 }
 
 __BIONIC_FORTIFY_INLINE
