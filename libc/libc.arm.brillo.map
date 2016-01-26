@@ -70,6 +70,7 @@ LIBC {
     __loc_aton;
     __loc_ntoa;
     __memchr_chk;
+    __memcmp_chk;
     __memcpy_chk;
     __memmove_chk;
     __memrchr_chk;
