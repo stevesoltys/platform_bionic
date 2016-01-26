@@ -73,6 +73,7 @@ libc_common_src_files += \
     bionic/__fwrite_chk.cpp \
     bionic/__getcwd_chk.cpp \
     bionic/__memchr_chk.cpp \
+    bionic/__memcmp_chk.cpp \
     bionic/__memmove_chk.cpp \
     bionic/__memrchr_chk.cpp \
     bionic/__poll_chk.cpp \
