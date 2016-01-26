@@ -138,6 +138,10 @@ extern void* __memrchr_chk(const void*, int, size_t, size_t);
 __errordecl(__memrchr_buf_size_error, "memrchr called with size bigger than buffer");
 extern void* __memrchr_real(const void*, int, size_t) __RENAME(memrchr);
 
+extern int __memcmp_chk(const void*, const void*, size_t, size_t, size_t);
+__errordecl(__memcmp_buf_size_error, "memcmp called with size bigger than buffer");
+extern int __memcmp_real(const void*, const void*, size_t) __RENAME(memcmp);
+
 extern char* __stpncpy_chk2(char* __restrict, const char* __restrict, size_t, size_t, size_t);
 extern char* __strncpy_chk2(char* __restrict, const char* __restrict, size_t, size_t, size_t);
 extern size_t __strlcpy_real(char* __restrict, const char* __restrict, size_t) __RENAME(strlcpy);
@@ -187,6 +191,32 @@ void* memrchr(const void *s, int c, size_t n) {
 #endif
 
     return __memrchr_chk(s, c, n, bos);
+}
+
+__BIONIC_FORTIFY_INLINE
+int memcmp(const void* a, const void* b, size_t n) {
+    size_t bos_a = __bos0(a);
+    size_t bos_b = __bos0(b);
+
+#if !defined(__clang__)
+    if (bos_a == __BIONIC_FORTIFY_UNKNOWN_SIZE && bos_b == __BIONIC_FORTIFY_UNKNOWN_SIZE) {
+        return __memcmp_real(a, b, n);
+    }
+
+    if (__builtin_constant_p(n) && n > bos_a) {
+        __memcmp_buf_size_error();
+    }
+
+    if (__builtin_constant_p(n) && n > bos_b) {
+        __memcmp_buf_size_error();
+    }
+
+    if (__builtin_constant_p(n) && n <= bos_a && n <= bos_b) {
+        return __memcmp_real(a, b, n);
+    }
+#endif
+
+    return __memcmp_chk(a, b, n, bos_a, bos_b);
 }
 
 __BIONIC_FORTIFY_INLINE
