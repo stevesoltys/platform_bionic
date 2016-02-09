@@ -153,7 +153,9 @@ struct dir_info {
 					/* free pages cache */
 	struct region_info free_regions[MALLOC_MAXCACHE];
 					/* delayed free chunk slots */
+	size_t queue_index;
 	void *delayed_chunks[MALLOC_DELAYED_CHUNK_MASK + 1];
+	void *delayed_chunks_queue[MALLOC_DELAYED_CHUNK_MASK + 1];
 	void *delayed_chunks_set[(MALLOC_DELAYED_CHUNK_MASK + 1) * 4];
 	size_t rbytesused;		/* random bytes used */
 	char *func;			/* current function */
@@ -1443,8 +1445,10 @@ validate_delayed_chunks(void)
 		return;
 	}
 	pool->func = "validate_delayed_chunks():";
-	for (i = 0; i < MALLOC_DELAYED_CHUNK_MASK + 1; i++)
+	for (i = 0; i < MALLOC_DELAYED_CHUNK_MASK + 1; i++) {
 		validate_junk(pool, pool->delayed_chunks[i]);
+		validate_junk(pool, pool->delayed_chunks_queue[i]);
+	}
 	_MALLOC_UNLOCK();
 }
 
@@ -1513,6 +1517,16 @@ ofree(struct dir_info *pool, void *p)
 			i = getrbyte(pool) & MALLOC_DELAYED_CHUNK_MASK;
 			tmp = p;
 			p = pool->delayed_chunks[i];
+			pool->delayed_chunks[i] = tmp;
+
+			if (p == NULL)
+				return;
+
+			tmp = p;
+			p = pool->delayed_chunks_queue[pool->queue_index];
+			pool->delayed_chunks_queue[pool->queue_index] = tmp;
+			pool->queue_index++;
+			pool->queue_index &= MALLOC_DELAYED_CHUNK_MASK;
 
 			if (p == NULL)
 				return;
@@ -1521,7 +1535,6 @@ ofree(struct dir_info *pool, void *p)
 
 			if (mopts.malloc_junk)
 				validate_junk(pool, p);
-			pool->delayed_chunks[i] = tmp;
 		}
 		if (p != NULL) {
 			r = find(pool, p);
