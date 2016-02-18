@@ -709,12 +709,10 @@ omalloc_init(struct dir_info **dp)
 			case 'S':
 				for (q = "CFGJPVI"; *q != '\0'; q++)
 					omalloc_parseopt(*q);
-				mopts.malloc_cache = 0;
 				break;
 			case 's':
 				for (q = "cfgjv"; *q != '\0'; q++)
 					omalloc_parseopt(*q);
-				mopts.malloc_cache = MALLOC_DEFAULT_CACHE;
 				break;
 			default:
 				omalloc_parseopt(*p);
