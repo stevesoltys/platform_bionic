@@ -707,12 +707,12 @@ omalloc_init(struct dir_info **dp)
 		for (; p != NULL && *p != '\0'; p++) {
 			switch (*p) {
 			case 'S':
-				for (q = "FGJPVI"; *q != '\0'; q++)
+				for (q = "CFGJPVI"; *q != '\0'; q++)
 					omalloc_parseopt(*q);
 				mopts.malloc_cache = 0;
 				break;
 			case 's':
-				for (q = "fgjv"; *q != '\0'; q++)
+				for (q = "cfgjv"; *q != '\0'; q++)
 					omalloc_parseopt(*q);
 				mopts.malloc_cache = MALLOC_DEFAULT_CACHE;
 				break;
