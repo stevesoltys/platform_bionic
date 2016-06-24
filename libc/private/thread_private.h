@@ -53,6 +53,8 @@ extern void *__dso_handle;
 extern int __register_atfork(void (*)(void), void(*)(void), void (*)(void), void *);
 #define _ARC4_ATFORK(f) __register_atfork(NULL, NULL, (f), __dso_handle)
 
+extern volatile sig_atomic_t _rs_forked;
+
 __END_DECLS
 
 #endif /* _THREAD_PRIVATE_H_ */

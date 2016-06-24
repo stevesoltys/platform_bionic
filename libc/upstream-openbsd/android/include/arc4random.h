@@ -41,13 +41,7 @@ _getentropy_fail(void)
 	raise(SIGKILL);
 }
 
-static volatile sig_atomic_t _rs_forked;
-
-static inline void
-_rs_forkhandler(void)
-{
-	_rs_forked = 1;
-}
+volatile sig_atomic_t _rs_forked;
 
 static inline void
 _rs_forkdetect(void)
@@ -82,6 +76,5 @@ _rs_allocate(struct _rs **rsp, struct _rsx **rsxp)
 	prctl(PR_SET_VMA, PR_SET_VMA_ANON_NAME, *rsxp, sizeof(**rsxp),
 	    "arc4random _rsx structure");
 
-	_ARC4_ATFORK(_rs_forkhandler);
 	return (0);
 }
