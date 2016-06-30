@@ -689,6 +689,7 @@ omalloc_init(struct dir_info **dp)
 	 */
 	mopts.malloc_junk = 1;
 	mopts.malloc_move = 1;
+	mopts.malloc_xmalloc = 1;
 	mopts.malloc_cache = MALLOC_DEFAULT_CACHE;
 	mopts.delayed_chunk_size = MALLOC_DELAYED_CHUNK_MASK + 1;
 
