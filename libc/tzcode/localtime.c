@@ -2437,7 +2437,8 @@ static int __bionic_open_tzdata_path(const char* path,
     return -1;
   }
 
-  static const size_t NAME_LENGTH = 40;
+  enum { NAME_LENGTH = 40 };
+
   struct index_entry_t {
     char buf[NAME_LENGTH];
     int32_t start;
