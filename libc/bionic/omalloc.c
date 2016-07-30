@@ -687,6 +687,7 @@ omalloc_init(struct dir_info **dp)
 	/*
 	 * Default options
 	 */
+	mopts.malloc_canaries = sizeof(void *);
 	mopts.malloc_junk = 1;
 	mopts.malloc_move = 1;
 	mopts.malloc_xmalloc = 1;
