@@ -504,7 +504,7 @@ map(struct dir_info *d, void *hint, size_t sz, int zero_fill)
 					madvise(p, sz, MADV_NORMAL);
 				if (zero_fill)
 					memset(p, 0, sz);
-				else if (mopts.malloc_junk == 2 &&
+				else if (mopts.malloc_junk &&
 				    mopts.malloc_freeunmap)
 					memset(p, SOME_FREEJUNK, sz);
 				return p;
@@ -524,7 +524,7 @@ map(struct dir_info *d, void *hint, size_t sz, int zero_fill)
 		d->free_regions_size -= psz;
 		if (zero_fill)
 			memset(p, 0, sz);
-		else if (mopts.malloc_junk == 2 && mopts.malloc_freeunmap)
+		else if (mopts.malloc_junk && mopts.malloc_freeunmap)
 			memset(p, SOME_FREEJUNK, sz);
 		return p;
 	}
@@ -603,7 +603,7 @@ omalloc_parseopt(char opt)
 		mopts.malloc_junk = 0;
 		break;
 	case 'J':
-		mopts.malloc_junk = 2;
+		mopts.malloc_junk = 1;
 		break;
 	case 'i':
 		mopts.malloc_junk_init = 0;
@@ -1511,8 +1511,7 @@ ofree(struct dir_info *pool, void *p)
 			STATS_SUB(pool->malloc_guarded, mopts.malloc_guard);
 		}
 		if (mopts.malloc_junk && !mopts.malloc_freeunmap) {
-			size_t amt = mopts.malloc_junk == 1 ? MALLOC_MAXCHUNK :
-			    PAGEROUND(sz) - mopts.malloc_guard;
+			size_t amt = PAGEROUND(sz) - mopts.malloc_guard;
 			memset(p, SOME_FREEJUNK, amt);
 		}
 		unmap(pool, p, PAGEROUND(sz));
