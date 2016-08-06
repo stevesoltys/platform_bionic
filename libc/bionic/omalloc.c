@@ -442,11 +442,8 @@ unmap(struct dir_info *d, void *p, size_t sz)
 	for (i = 0; i < mopts.malloc_cache; i++) {
 		r = &d->free_regions[(i + offset) & (mopts.malloc_cache - 1)];
 		if (r->p == NULL) {
-			if (mopts.malloc_junk && !mopts.malloc_freeunmap) {
-				size_t amt = mopts.malloc_junk == 1 ?
-				    MALLOC_MAXCHUNK : sz;
-				memset(p, SOME_FREEJUNK, amt);
-			}
+			if (mopts.malloc_junk && !mopts.malloc_freeunmap)
+				memset(p, SOME_FREEJUNK, sz);
 			if (mopts.malloc_hint)
 				madvise(p, sz, MADV_FREE);
 			if (mopts.malloc_freeunmap)
@@ -524,7 +521,7 @@ map(struct dir_info *d, void *hint, size_t sz, int zero_fill)
 					madvise(p, sz, MADV_NORMAL);
 				if (zero_fill)
 					memset(p, 0, sz);
-				else if (mopts.malloc_junk == 2 &&
+				else if (mopts.malloc_junk &&
 				    mopts.malloc_freeunmap)
 					memset(p, SOME_FREEJUNK, sz);
 				return p;
@@ -544,7 +541,7 @@ map(struct dir_info *d, void *hint, size_t sz, int zero_fill)
 		d->free_regions_size -= psz;
 		if (zero_fill)
 			memset(p, 0, sz);
-		else if (mopts.malloc_junk == 2 && mopts.malloc_freeunmap)
+		else if (mopts.malloc_junk && mopts.malloc_freeunmap)
 			memset(p, SOME_FREEJUNK, sz);
 		return p;
 	}
@@ -620,12 +617,10 @@ omalloc_parseopt(char opt)
 		mopts.malloc_hint = 1;
 		break;
 	case 'j':
-		if (mopts.malloc_junk > 0)
-			mopts.malloc_junk--;
+		mopts.malloc_junk = 0;
 		break;
 	case 'J':
-		if (mopts.malloc_junk < 2)
-			mopts.malloc_junk++;
+		mopts.malloc_junk = 1;
 		break;
 	case 'i':
 		mopts.malloc_junk_init = 0;
