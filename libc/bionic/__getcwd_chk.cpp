@@ -31,7 +31,7 @@
 #include <unistd.h>
 #include "private/libc_logging.h"
 
-extern char* __getcwd_chk(char* buf, size_t len, size_t buflen) {
+extern char* __unchecked___getcwd_chk(char* buf, size_t len, size_t buflen) {
   if (__predict_false(len > buflen)) {
     __fortify_chk_fail("getcwd: prevented write past end of buffer", 0);
   }
