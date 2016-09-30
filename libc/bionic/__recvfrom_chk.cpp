@@ -32,7 +32,7 @@
 #include <sys/socket.h>
 #include "private/libc_logging.h"
 
-ssize_t __recvfrom_chk(int socket, void* buf, size_t len, size_t buflen,
+ssize_t __unchecked___recvfrom_chk(int socket, void* buf, size_t len, size_t buflen,
                        int flags, const struct sockaddr* src_addr,
                        socklen_t* addrlen) {
   if (__predict_false(len > buflen)) {

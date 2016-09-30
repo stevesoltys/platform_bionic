@@ -30,7 +30,7 @@
 #include <unistd.h>
 #include "private/libc_logging.h"
 
-extern "C" ssize_t __write_chk(int fd, const void* buf, size_t count, size_t buf_size) {
+extern "C" ssize_t __unchecked___write_chk(int fd, const void* buf, size_t count, size_t buf_size) {
   if (__predict_false(count > buf_size)) {
     __fortify_chk_fail("write: prevented read past end of buffer", 0);
   }
