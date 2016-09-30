@@ -30,7 +30,7 @@
 #include <unistd.h>
 #include "private/libc_logging.h"
 
-extern "C" ssize_t __readlink_chk(const char* path, char* buf, size_t size, size_t buf_size) {
+extern "C" ssize_t __unchecked___readlink_chk(const char* path, char* buf, size_t size, size_t buf_size) {
   if (__predict_false(size > buf_size)) {
     __fortify_chk_fail("readlink: prevented write past end of buffer", 0);
   }
