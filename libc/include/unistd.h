@@ -142,7 +142,10 @@ extern int chroot(const char* __path);
 extern int symlink(const char* __oldpath, const char* __newpath);
 extern int symlinkat(const char* __oldpath, int __newdirfd,
                      const char* __newpath) __INTRODUCED_IN(21);
+extern ssize_t __unchecked_readlink(const char* __path, char* __buf, size_t __bufsiz);
 extern ssize_t readlink(const char* __path, char* __buf, size_t __bufsiz);
+extern ssize_t __unchecked_readlinkat(int __dirfd, const char* __path, char* __buf,
+                                      size_t __bufsiz) __INTRODUCED_IN(21);
 extern ssize_t readlinkat(int __dirfd, const char* __path, char* __buf,
                           size_t __bufsiz) __INTRODUCED_IN(21);
 extern int chown(const char* __path, uid_t __owner, gid_t __group);
@@ -150,13 +153,16 @@ extern int fchown(int __fd, uid_t __owner, gid_t __group);
 extern int fchownat(int __dirfd, const char* __path, uid_t __owner,
                     gid_t __group, int __flags);
 extern int lchown(const char* __path, uid_t __owner, gid_t __group);
+extern char* __unchecked_getcwd(char* __buf, size_t __size);
 extern char* getcwd(char* __buf, size_t __size);
 
 extern int sync(void);
 
 extern int close(int __fd);
 
+extern ssize_t __unchecked_read(int __fd, void* __buf, size_t __count);
 extern ssize_t read(int __fd, void* __buf, size_t __count);
+extern ssize_t __unchecked_write(int __fd, const void* __buf, size_t __count);
 extern ssize_t write(int __fd, const void* __buf, size_t __count);
 
 extern int dup(int __oldfd);
@@ -177,21 +183,31 @@ extern off64_t lseek64(int __fd, off64_t __offset, int __whence);
 
 #if defined(__USE_FILE_OFFSET64) && __ANDROID_API__ >= 21
 extern int truncate(const char* __path, off_t __length) __RENAME(truncate64);
+extern ssize_t __unchecked_pread(int __fd, void* __buf, size_t __count, off_t __offset)
+  __RENAME(__unchecked_pread64);
 extern ssize_t pread(int __fd, void* __buf, size_t __count, off_t __offset)
   __RENAME(pread64);
+extern ssize_t __unchecked_pwrite(int __fd, const void* __buf, size_t __count,
+                                  off_t __offset) __RENAME(__unchecked_pwrite64);
 extern ssize_t pwrite(int __fd, const void* __buf, size_t __count,
                       off_t __offset) __RENAME(pwrite64);
 extern int ftruncate(int __fd, off_t __length) __RENAME(ftruncate64);
 #else
 extern int truncate(const char* __path, off_t __length);
+extern ssize_t __unchecked_pread(int __fd, void* __buf, size_t __count, off_t __offset);
 extern ssize_t pread(int __fd, void* __buf, size_t __count, off_t __offset);
+extern ssize_t __unchecked_pwrite(int __fd, const void* __buf, size_t __count,
+                                  off_t __offset);
 extern ssize_t pwrite(int __fd, const void* __buf, size_t __count,
                       off_t __offset);
 extern int ftruncate(int __fd, off_t __length);
 #endif
 
 extern int truncate64(const char* __path, off64_t __length) __INTRODUCED_IN(21);
+extern ssize_t __unchecked_pread64(int __fd, void* __buf, size_t __count, off64_t __offset) __INTRODUCED_IN(21);
 extern ssize_t pread64(int __fd, void* __buf, size_t __count, off64_t __offset) __INTRODUCED_IN(21);
+extern ssize_t __unchecked_pwrite64(int __fd, const void* __buf, size_t __count,
+                                    off64_t __offset) __INTRODUCED_IN(21);
 extern ssize_t pwrite64(int __fd, const void* __buf, size_t __count,
                         off64_t __offset) __INTRODUCED_IN(21);
 extern int ftruncate64(int __fd, off64_t __length) __INTRODUCED_IN(21);
@@ -249,6 +265,7 @@ extern int tcsetpgrp(int __fd, pid_t __pid);
     _rc; })
 
 /* TODO(unified-headers): Factor out all the FORTIFY features. */
+extern char* __unchecked___getcwd_chk(char*, size_t, size_t);
 extern char* __getcwd_chk(char*, size_t, size_t);
 __errordecl(__getcwd_dest_size_error, "getcwd called with size bigger than destination");
 extern char* __getcwd_real(char*, size_t) __RENAME(getcwd);
@@ -273,21 +290,25 @@ __errordecl(__pwrite64_dest_size_error, "pwrite64 called with size bigger than d
 __errordecl(__pwrite64_count_toobig_error, "pwrite64 called with count > SSIZE_MAX");
 extern ssize_t __pwrite64_real(int, const void*, size_t, off64_t) __RENAME(pwrite64);
 
+extern ssize_t __unchecked___read_chk(int, void*, size_t, size_t);
 extern ssize_t __read_chk(int, void*, size_t, size_t);
 __errordecl(__read_dest_size_error, "read called with size bigger than destination");
 __errordecl(__read_count_toobig_error, "read called with count > SSIZE_MAX");
 extern ssize_t __read_real(int, void*, size_t) __RENAME(read);
 
+extern ssize_t __unchecked___write_chk(int, const void*, size_t, size_t);
 extern ssize_t __write_chk(int, const void*, size_t, size_t);
 __errordecl(__write_dest_size_error, "write called with size bigger than destination");
 __errordecl(__write_count_toobig_error, "write called with count > SSIZE_MAX");
 extern ssize_t __write_real(int, const void*, size_t) __RENAME(write);
 
+extern ssize_t __unchecked___readlink_chk(const char*, char*, size_t, size_t);
 extern ssize_t __readlink_chk(const char*, char*, size_t, size_t);
 __errordecl(__readlink_dest_size_error, "readlink called with size bigger than destination");
 __errordecl(__readlink_size_toobig_error, "readlink called with size > SSIZE_MAX");
 extern ssize_t __readlink_real(const char*, char*, size_t) __RENAME(readlink);
 
+extern ssize_t __unchecked___readlinkat_chk(int dirfd, const char*, char*, size_t, size_t);
 extern ssize_t __readlinkat_chk(int dirfd, const char*, char*, size_t, size_t);
 __errordecl(__readlinkat_dest_size_error, "readlinkat called with size bigger than destination");
 __errordecl(__readlinkat_size_toobig_error, "readlinkat called with size > SSIZE_MAX");

@@ -29,6 +29,7 @@
 #define _PTHREAD_INTERNAL_H_
 
 #include <pthread.h>
+#include <signal.h>
 #include <stdatomic.h>
 
 #include "private/bionic_lock.h"
@@ -61,6 +62,7 @@ class pthread_internal_t {
   class pthread_internal_t* prev;
 
   pid_t tid;
+  sig_atomic_t in_malloc;
 
  private:
   pid_t cached_pid_;
