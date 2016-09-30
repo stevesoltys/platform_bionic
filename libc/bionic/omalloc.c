@@ -35,6 +35,7 @@
 #include <limits.h>
 #include <pthread.h>
 #include <stdalign.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -61,16 +62,20 @@ static void atexit_handler_wrapper(void *func) {
 
 #define atexit(func) (__cxa_atexit(atexit_handler_wrapper, func, &__dso_handle))
 
+extern void set_in_malloc(bool);
+
 extern char *__progname;
 extern int __isthreaded;
 static pthread_mutex_t _malloc_lock = PTHREAD_MUTEX_INITIALIZER;
 
 static void _MALLOC_LOCK() {
+	set_in_malloc(true);
 	pthread_mutex_lock(&_malloc_lock);
 }
 
 static void _MALLOC_UNLOCK() {
 	pthread_mutex_unlock(&_malloc_lock);
+	set_in_malloc(false);
 }
 
 #ifndef MALLOC_ALIGNMENT
