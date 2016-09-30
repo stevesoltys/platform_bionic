@@ -19,6 +19,7 @@ LIBC {
     __dn_comp;
     __dn_count_labels;
     __dn_skipname;
+    __dynamic_object_size;
     __epoll_pwait; # arm x86 mips
     __errno;
     __exit; # arm x86 mips
