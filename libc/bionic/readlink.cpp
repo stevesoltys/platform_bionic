@@ -33,6 +33,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-ssize_t readlink(const char* path, char* buf, size_t size) {
+ssize_t __unchecked_readlink(const char* path, char* buf, size_t size) {
   return readlinkat(AT_FDCWD, path, buf, size);
 }
