@@ -17,6 +17,7 @@
 #include "linker_allocator.h"
 
 #include <stdlib.h>
+#include <limits.h>
 
 static LinkerMemoryAllocator g_linker_allocator;
 
@@ -36,3 +37,6 @@ void free(void* ptr) {
   g_linker_allocator.free(ptr);
 }
 
+extern "C" size_t __malloc_object_size(const void*) {
+  return SIZE_MAX;
+}
