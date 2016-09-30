@@ -32,7 +32,7 @@
 #include <sys/socket.h>
 #include "private/libc_logging.h"
 
-ssize_t __sendto_chk(int socket, const void* buf, size_t len, size_t buflen,
+ssize_t __unchecked___sendto_chk(int socket, const void* buf, size_t len, size_t buflen,
                      int flags, const struct sockaddr* dest_addr,
                      socklen_t addrlen) {
   if (__predict_false(len > buflen)) {
