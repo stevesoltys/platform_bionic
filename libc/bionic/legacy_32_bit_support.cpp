@@ -71,12 +71,12 @@ off64_t lseek64(int fd, off64_t off, int whence) {
 }
 
 // There is no pread for 32-bit off_t, so we need to widen and call pread64.
-ssize_t pread(int fd, void* buf, size_t byte_count, off_t offset) {
+ssize_t __unchecked_pread(int fd, void* buf, size_t byte_count, off_t offset) {
   return pread64(fd, buf, byte_count, static_cast<off64_t>(offset));
 }
 
 // There is no pwrite for 32-bit off_t, so we need to widen and call pwrite64.
-ssize_t pwrite(int fd, const void* buf, size_t byte_count, off_t offset) {
+ssize_t __unchecked_pwrite(int fd, const void* buf, size_t byte_count, off_t offset) {
   return pwrite64(fd, buf, byte_count, static_cast<off64_t>(offset));
 }
 
