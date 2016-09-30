@@ -616,6 +616,7 @@ libc_openbsd_src_files_32 += \
 libc_common_cflags := \
     -D_LIBC=1 \
     -Wall -Wextra -Wunused \
+    -D__DISABLE_DYNAMIC_OBJECT_SIZE
 
 use_clang := $(USE_CLANG_PLATFORM_BUILD)
 

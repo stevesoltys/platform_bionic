@@ -40,6 +40,7 @@ LOCAL_CFLAGS += \
     -Wstrict-overflow=5 \
     -fvisibility=hidden \
     -Wall -Wextra -Wunused -Werror \
+    -D__DYNAMIC_DYNAMIC_OBJECT_SIZE
 
 LOCAL_CFLAGS_arm += -D__work_around_b_24465209__
 LOCAL_CFLAGS_x86 += -D__work_around_b_24465209__

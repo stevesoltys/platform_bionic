@@ -26,10 +26,93 @@
  * SUCH DAMAGE.
  */
 
+
+#undef _FORTIFY_SOURCE
+#undef __DISABLE_DYNAMIC_OBJECT_SIZE
+#include <fcntl.h>
 #include <stddef.h>
+#include <sys/socket.h>
+#include <unistd.h>
+#include "private/libc_logging.h"
 
 extern "C" size_t __malloc_object_size(const void*);
 
 extern "C" size_t __dynamic_object_size(const void* ptr) {
   return __malloc_object_size(ptr);
+}
+
+ssize_t readlink(const char* path, char* buf, size_t size) {
+  return readlinkat(AT_FDCWD, path, buf, size);
+}
+
+ssize_t readlinkat(int dirfd, const char* path, char* buf, size_t size) {
+  if (size > __dynamic_object_size(buf)) {
+    __fortify_chk_fail("readlinkat: prevented write past end of buffer", 0);
+  }
+  return __unchecked_readlinkat(dirfd, path, buf, size);
+}
+
+char* getcwd(char* buf, size_t size) {
+  if (size > __dynamic_object_size(buf)) {
+    __fortify_chk_fail("getcwd: prevented write past end of buffer", 0);
+  }
+  return __unchecked_getcwd(buf, size);
+}
+
+ssize_t read(int fd, void* buf, size_t count) {
+  if (count > __dynamic_object_size(buf)) {
+    __fortify_chk_fail("read: prevented write past end of buffer", 0);
+  }
+  return __unchecked_read(fd, buf, count);
+}
+
+ssize_t write(int fd, const void* buf, size_t count) {
+  if (count > __dynamic_object_size(buf)) {
+    __fortify_chk_fail("write: prevented read past end of buffer", 0);
+  }
+  return __unchecked_write(fd, buf, count);
+}
+
+ssize_t pread(int fd, void* buf, size_t byte_count, off_t offset) {
+  return pread64(fd, buf, byte_count, static_cast<off64_t>(offset));
+}
+
+ssize_t pwrite(int fd, const void* buf, size_t byte_count, off_t offset) {
+  return pwrite64(fd, buf, byte_count, static_cast<off64_t>(offset));
+}
+
+ssize_t pread64(int fd, void* buf, size_t byte_count, off64_t offset) {
+  if (byte_count > __dynamic_object_size(buf)) {
+    __fortify_chk_fail("pread64: prevented write past end of buffer", 0);
+  }
+  return __unchecked_pread64(fd, buf, byte_count, offset);
+}
+
+ssize_t pwrite64(int fd, const void* buf, size_t byte_count, off64_t offset) {
+  if (byte_count > __dynamic_object_size(buf)) {
+    __fortify_chk_fail("pwrite64: prevented read past end of buffer", 0);
+  }
+  return __unchecked_pwrite64(fd, buf, byte_count, offset);
+}
+
+ssize_t send(int socket, const void* buf, size_t len, int flags) {
+  return sendto(socket, buf, len, flags, NULL, 0);
+}
+
+ssize_t recv(int socket, void *buf, size_t len, int flags) {
+  return recvfrom(socket, buf, len, flags, NULL, 0);
+}
+
+ssize_t recvfrom(int fd, void* buf, size_t len, int flags, const struct sockaddr* src_addr, socklen_t* addr_len) {
+  if (len > __dynamic_object_size(buf)) {
+    __fortify_chk_fail("recvfrom: prevented write past end of buffer", 0);
+  }
+  return __unchecked_recvfrom(fd, buf, len, flags, src_addr, addr_len);
+}
+
+ssize_t sendto(int fd, const void* buf, size_t len, int flags, const struct sockaddr* dest_addr, socklen_t addr_len) {
+  if (len > __dynamic_object_size(buf)) {
+    __fortify_chk_fail("sendto: prevented read past end of buffer", 0);
+  }
+  return __unchecked_sendto(fd, buf, len, flags, dest_addr, addr_len);
 }

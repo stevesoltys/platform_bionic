@@ -142,22 +142,48 @@ extern int chroot(const char* __path);
 extern int symlink(const char* __oldpath, const char* __newpath);
 extern int symlinkat(const char* __oldpath, int __newdirfd,
                      const char* __newpath) __INTRODUCED_IN(21);
+extern ssize_t __unchecked_readlink(const char* __path, char* __buf, size_t __bufsiz);
+#if defined(__DISABLE_DYNAMIC_OBJECT_SIZE)
+#define readlink __unchecked_readlink
+#else
 extern ssize_t readlink(const char* __path, char* __buf, size_t __bufsiz);
+#endif
+extern ssize_t __unchecked_readlinkat(int __dirfd, const char* __path, char* __buf,
+                                      size_t __bufsiz) __INTRODUCED_IN(21);
+#if defined(__DISABLE_DYNAMIC_OBJECT_SIZE)
+#define readlinkat __unchecked_readlinkat
+#else
 extern ssize_t readlinkat(int __dirfd, const char* __path, char* __buf,
                           size_t __bufsiz) __INTRODUCED_IN(21);
+#endif
 extern int chown(const char* __path, uid_t __owner, gid_t __group);
 extern int fchown(int __fd, uid_t __owner, gid_t __group);
 extern int fchownat(int __dirfd, const char* __path, uid_t __owner,
                     gid_t __group, int __flags);
 extern int lchown(const char* __path, uid_t __owner, gid_t __group);
+extern char* __unchecked_getcwd(char* __buf, size_t __size);
+#if defined(__DISABLE_DYNAMIC_OBJECT_SIZE)
+#define getcwd __unchecked_getcwd
+#else
 extern char* getcwd(char* __buf, size_t __size);
+#endif
 
 extern int sync(void);
 
 extern int close(int __fd);
 
+extern ssize_t __unchecked_read(int __fd, void* __buf, size_t __count);
+#if defined(__DISABLE_DYNAMIC_OBJECT_SIZE)
+#define read __unchecked_read
+#else
 extern ssize_t read(int __fd, void* __buf, size_t __count);
+#endif
+extern ssize_t __unchecked_write(int __fd, const void* __buf, size_t __count);
+#if defined(__DISABLE_DYNAMIC_OBJECT_SIZE)
+#define write __unchecked_write
+#else
 extern ssize_t write(int __fd, const void* __buf, size_t __count);
+#endif
 
 extern int dup(int __oldfd);
 extern int dup2(int __oldfd, int __newfd);
@@ -177,23 +203,57 @@ extern off64_t lseek64(int __fd, off64_t __offset, int __whence);
 
 #if defined(__USE_FILE_OFFSET64) && __ANDROID_API__ >= 21
 extern int truncate(const char* __path, off_t __length) __RENAME(truncate64);
+extern ssize_t __unchecked_pread(int __fd, void* __buf, size_t __count, off_t __offset)
+  __RENAME(__unchecked_pread64);
+#if defined(__DISABLE_DYNAMIC_OBJECT_SIZE)
+#define pread __unchecked_pread
+#else
 extern ssize_t pread(int __fd, void* __buf, size_t __count, off_t __offset)
   __RENAME(pread64);
+#endif
+extern ssize_t __unchecked_pwrite(int __fd, const void* __buf, size_t __count,
+                                  off_t __offset) __RENAME(__unchecked_pwrite64);
+#if defined(__DISABLE_DYNAMIC_OBJECT_SIZE)
+#define pwrite __unchecked_pwrite
+#else
 extern ssize_t pwrite(int __fd, const void* __buf, size_t __count,
                       off_t __offset) __RENAME(pwrite64);
+#endif
 extern int ftruncate(int __fd, off_t __length) __RENAME(ftruncate64);
 #else
 extern int truncate(const char* __path, off_t __length);
+extern ssize_t __unchecked_pread(int __fd, void* __buf, size_t __count, off_t __offset);
+#if defined(__DISABLE_DYNAMIC_OBJECT_SIZE)
+#define pread __unchecked_pread
+#else
 extern ssize_t pread(int __fd, void* __buf, size_t __count, off_t __offset);
+#endif
+extern ssize_t __unchecked_pwrite(int __fd, const void* __buf, size_t __count,
+                                  off_t __offset);
+#if defined(__DISABLE_DYNAMIC_OBJECT_SIZE)
+#define pwrite __unchecked_pwrite
+#else
 extern ssize_t pwrite(int __fd, const void* __buf, size_t __count,
                       off_t __offset);
+#endif
 extern int ftruncate(int __fd, off_t __length);
 #endif
 
 extern int truncate64(const char* __path, off64_t __length) __INTRODUCED_IN(21);
+extern ssize_t __unchecked_pread64(int __fd, void* __buf, size_t __count, off64_t __offset) __INTRODUCED_IN(21);
+#if defined(__DISABLE_DYNAMIC_OBJECT_SIZE)
+#define pread64 __unchecked_pread64
+#else
 extern ssize_t pread64(int __fd, void* __buf, size_t __count, off64_t __offset) __INTRODUCED_IN(21);
+#endif
+extern ssize_t __unchecked_pwrite64(int __fd, const void* __buf, size_t __count,
+                                    off64_t __offset) __INTRODUCED_IN(21);
+#if defined(__DISABLE_DYNAMIC_OBJECT_SIZE)
+#define pwrite64 __unchecked_pwrite64
+#else
 extern ssize_t pwrite64(int __fd, const void* __buf, size_t __count,
                         off64_t __offset) __INTRODUCED_IN(21);
+#endif
 extern int ftruncate64(int __fd, off64_t __length) __INTRODUCED_IN(21);
 
 extern int pause(void);

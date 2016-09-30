@@ -285,11 +285,31 @@ __socketcall int shutdown(int, int);
 __socketcall int socket(int, int, int);
 __socketcall int socketpair(int, int, int, int*);
 
+extern ssize_t __unchecked_send(int, const void*, size_t, int);
+#if defined(__DISABLE_DYNAMIC_OBJECT_SIZE)
+#define send __unchecked_send
+#else
 extern ssize_t send(int, const void*, size_t, int);
+#endif
+extern ssize_t __unchecked_recv(int, void*, size_t, int);
+#if defined(__DISABLE_DYNAMIC_OBJECT_SIZE)
+#define recv __unchecked_recv
+#else
 extern ssize_t recv(int, void*, size_t, int);
+#endif
 
+__socketcall ssize_t __unchecked_sendto(int, const void*, size_t, int, const struct sockaddr*, socklen_t);
+#if defined(__DISABLE_DYNAMIC_OBJECT_SIZE)
+#define sendto __unchecked_sendto
+#else
 __socketcall ssize_t sendto(int, const void*, size_t, int, const struct sockaddr*, socklen_t);
+#endif
+__socketcall ssize_t __unchecked_recvfrom(int, void*, size_t, int, const struct sockaddr*, socklen_t*);
+#if defined(__DISABLE_DYNAMIC_OBJECT_SIZE)
+#define recvfrom __unchecked_recvfrom
+#else
 __socketcall ssize_t recvfrom(int, void*, size_t, int, const struct sockaddr*, socklen_t*);
+#endif
 
 __errordecl(__recvfrom_error, "recvfrom called with size bigger than buffer");
 extern ssize_t __recvfrom_chk(int, void*, size_t, size_t, int, const struct sockaddr*, socklen_t*);
