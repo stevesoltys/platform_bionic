@@ -88,12 +88,12 @@ int     sigaltstack(const stack_t*, stack_t*) all
 int     acct(const char*  filepath)  all
 
 # file descriptors
-ssize_t     read(int, void*, size_t)        all
-ssize_t     write(int, const void*, size_t)       all
-ssize_t     pread64(int, void*, size_t, off64_t) arm,mips,x86
-ssize_t     pread64|pread(int, void*, size_t, off_t) arm64,mips64,x86_64
-ssize_t     pwrite64(int, void*, size_t, off64_t) arm,mips,x86
-ssize_t     pwrite64|pwrite(int, void*, size_t, off_t) arm64,mips64,x86_64
+ssize_t     __unchecked_read:read(int, void*, size_t)        all
+ssize_t     __unchecked_write:write(int, const void*, size_t)       all
+ssize_t     __unchecked_pread64:pread64(int, void*, size_t, off64_t) arm,mips,x86
+ssize_t     __unchecked_pread64|__unchecked_pread:pread64(int, void*, size_t, off_t) arm64,mips64,x86_64
+ssize_t     __unchecked_pwrite64:pwrite64(int, void*, size_t, off64_t) arm,mips,x86
+ssize_t     __unchecked_pwrite64|__unchecked_pwrite:pwrite64(int, void*, size_t, off_t) arm64,mips64,x86_64
 
 # On LP32, preadv/pwritev don't use off64_t --- they use pairs of 32-bit
 # arguments to avoid problems on architectures like ARM where 64-bit arguments
@@ -147,7 +147,7 @@ int fstatat64|fstatat:newfstatat(int, const char*, struct stat*, int)  arm64,x86
 int linkat(int, const char*, int, const char*, int)  all
 int mkdirat(int, const char*, mode_t)  all
 int mknodat(int, const char*, mode_t, dev_t)  all
-int readlinkat(int, const char*, char*, size_t)  all
+int __unchecked_readlinkat:readlinkat(int, const char*, char*, size_t)  all
 int renameat(int, const char*, int, const char*)  all
 int symlinkat(const char*, int, const char*)  all
 int unlinkat(int, const char*, int)   all
@@ -245,8 +245,8 @@ int           listen(int, int)                   arm,arm64,mips,mips64,x86_64
 int           __accept4:accept4(int, struct sockaddr*, socklen_t*, int)  arm,arm64,mips,mips64,x86_64
 int           getsockname(int, struct sockaddr*, socklen_t*)  arm,arm64,mips,mips64,x86_64
 int           getpeername(int, struct sockaddr*, socklen_t*)  arm,arm64,mips,mips64,x86_64
-int           sendto(int, const void*, size_t, int, const struct sockaddr*, socklen_t)  arm,arm64,mips,mips64,x86_64
-int           recvfrom(int, void*, size_t, unsigned int, struct sockaddr*, socklen_t*)  arm,arm64,mips,mips64,x86_64
+int           __unchecked_sendto:sendto(int, const void*, size_t, int, const struct sockaddr*, socklen_t)  arm,arm64,mips,mips64,x86_64
+int           __unchecked_recvfrom:recvfrom(int, void*, size_t, unsigned int, struct sockaddr*, socklen_t*)  arm,arm64,mips,mips64,x86_64
 int           shutdown(int, int)  arm,arm64,mips,mips64,x86_64
 int           setsockopt(int, int, int, const void*, socklen_t)  arm,arm64,mips,mips64,x86_64
 int           getsockopt(int, int, int, void*, socklen_t*)    arm,arm64,mips,mips64,x86_64
@@ -263,8 +263,8 @@ int           listen:socketcall:4(int, int)                   x86
 int           getsockname:socketcall:6(int, struct sockaddr*, socklen_t*)  x86
 int           getpeername:socketcall:7(int, struct sockaddr*, socklen_t*)  x86
 int           socketpair:socketcall:8(int, int, int, int*)    x86
-int           sendto:socketcall:11(int, const void*, size_t, int, const struct sockaddr*, socklen_t)  x86
-int           recvfrom:socketcall:12(int, void*, size_t, unsigned int, struct sockaddr*, socklen_t*)  x86
+int           __unchecked_sendto:socketcall:11(int, const void*, size_t, int, const struct sockaddr*, socklen_t)  x86
+int           __unchecked_recvfrom:socketcall:12(int, void*, size_t, unsigned int, struct sockaddr*, socklen_t*)  x86
 int           shutdown:socketcall:13(int, int)  x86
 int           setsockopt:socketcall:14(int, int, int, const void*, socklen_t)  x86
 int           getsockopt:socketcall:15(int, int, int, void*, socklen_t*)    x86
