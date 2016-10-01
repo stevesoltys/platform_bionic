@@ -28,22 +28,29 @@
 
 #include "libc_init_common.h"
 
+#include <limits.h>
+#include <sys/mman.h>
+
 #include "private/KernelArgumentBlock.h"
 #include "private/bionic_auxv.h"
 #include "private/bionic_globals.h"
-#include "private/bionic_ssp.h"
+#include "private/libc_logging.h"
 #include "pthread_internal.h"
 
 extern "C" int __set_tls(void* ptr);
 extern "C" int __set_tid_address(int* tid_address);
 
 // Declared in "private/bionic_ssp.h".
-uintptr_t __stack_chk_guard = 0;
+__attribute__((aligned(PAGE_SIZE)))
+uintptr_t __stack_chk_guard[PAGE_SIZE / sizeof(uintptr_t)] = {0};
 
 void __libc_init_global_stack_chk_guard(KernelArgumentBlock& args) {
   // AT_RANDOM is a pointer to 16 bytes of randomness on the stack.
   // Take the first 4/8 for the -fstack-protector implementation.
-  __stack_chk_guard = *reinterpret_cast<uintptr_t*>(args.getauxval(AT_RANDOM));
+  __stack_chk_guard[0] = *reinterpret_cast<uintptr_t*>(args.getauxval(AT_RANDOM));
+  if (mprotect(__stack_chk_guard, sizeof(__stack_chk_guard), PROT_READ) == -1) {
+    __libc_fatal("mprotect __stack_chk_guard: %s", strerror(errno));
+  }
 }
 
 // Setup for the main thread. For dynamic executables, this is called by the
