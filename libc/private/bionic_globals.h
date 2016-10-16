@@ -39,6 +39,7 @@ struct libc_globals {
   vdso_entry vdso[VDSO_END];
   long setjmp_cookie;
   bool enable_object_size_checks;
+  void* main_thread_stack_top;
   MallocDispatch malloc_dispatch;
 };
 
