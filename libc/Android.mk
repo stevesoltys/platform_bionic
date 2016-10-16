@@ -249,7 +249,8 @@ libc_bionic_ndk_src_files := \
     bionic/wchar.cpp \
     bionic/wctype.cpp \
     bionic/wmempcpy.cpp \
-    bionic/__dynamic_object_size.cpp
+    bionic/__dynamic_object_size.cpp \
+    bionic/guarded.cpp
 
 libc_bionic_src_files :=
 
