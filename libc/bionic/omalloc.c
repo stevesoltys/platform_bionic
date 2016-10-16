@@ -821,7 +821,7 @@ omalloc_poolinit(struct dir_info **dp)
 	rbytes_init(d);
 	d->regions_free = d->regions_total = MALLOC_INITIAL_REGIONS;
 	regioninfo_size = d->regions_total * sizeof(struct region_info);
-	d->r = MMAP(regioninfo_size);
+	d->r = __map_guarded(regioninfo_size);
 	if (d->r == MAP_FAILED) {
 		d->regions_total = 0;
 		wrterror(NULL, "malloc init mmap failed", NULL);
@@ -843,7 +843,7 @@ omalloc_poolinit(struct dir_info **dp)
 
 	if (mopts.delayed_chunk_size) {
 		size_t quarantine_size = mopts.delayed_chunk_size * 6 * sizeof(void *);
-		d->delayed_chunks = MMAP(quarantine_size);
+		d->delayed_chunks = __map_guarded(quarantine_size);
 		if (d->delayed_chunks == MAP_FAILED)
 			wrterror(NULL, "malloc init mmap failed", NULL);
 		prctl(PR_SET_VMA, PR_SET_VMA_ANON_NAME, d->delayed_chunks, quarantine_size,
@@ -869,7 +869,7 @@ omalloc_grow(struct dir_info *d)
 	newsize = newtotal * sizeof(struct region_info);
 	mask = newtotal - 1;
 
-	p = MMAP(newsize);
+	p = __map_guarded(newsize);
 	if (p == MAP_FAILED)
 		return 1;
 
@@ -892,7 +892,7 @@ omalloc_grow(struct dir_info *d)
 		}
 	}
 	/* avoid pages containing meta info to end up in cache */
-	if (munmap(d->r, d->regions_total * sizeof(struct region_info)))
+	if (__unmap_guarded(d->r, d->regions_total * sizeof(struct region_info)))
 		wrterror(d, "munmap", d->r);
 	else
 		STATS_SUB(d->malloc_used,
@@ -922,7 +922,7 @@ alloc_chunk_info(struct dir_info *d, int bits)
 		char *q;
 		int i;
 
-		q = MMAP(MALLOC_PAGESIZE);
+		q = __map_guarded(MALLOC_PAGESIZE);
 		if (q == MAP_FAILED)
 			return NULL;
 
