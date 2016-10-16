@@ -74,6 +74,9 @@ extern int mincore(void*, size_t, unsigned char*);
 
 extern int posix_madvise(void*, size_t, int);
 
+extern void* __map_guarded(size_t);
+extern int __unmap_guarded(void*, size_t);
+
 __END_DECLS
 
 #endif /* _SYS_MMAN_H_ */
