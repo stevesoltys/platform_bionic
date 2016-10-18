@@ -84,6 +84,7 @@ __attribute__((constructor)) static void __libc_preinit() {
 
   // Hooks for various libraries to let them know that we're starting up.
   __libc_globals.mutate(__libc_init_malloc);
+  __libc_globals.mutate(__libc_init_dynamic_object_size);
   netdClientInit();
 }
 
