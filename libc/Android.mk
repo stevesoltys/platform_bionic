@@ -646,6 +646,10 @@ ifeq ($(strip $(DEBUG_BIONIC_LIBC)),true)
   libc_common_cflags += -DDEBUG
 endif
 
+ifneq (,$(filter userdebug eng, $(TARGET_BUILD_VARIANT)))
+  libc_common_cflags += -DDEBUG_BUILD=1
+endif
+
 libc_malloc_src := bionic/omalloc.c
 
 # Define some common conlyflags
