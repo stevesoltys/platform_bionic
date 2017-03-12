@@ -48,7 +48,7 @@ void __libc_init_global_stack_chk_guard(KernelArgumentBlock& args) {
   // AT_RANDOM is a pointer to 16 bytes of randomness on the stack.
   // Take the first 4/8 for the -fstack-protector implementation.
   __stack_chk_guard[0] = *reinterpret_cast<uintptr_t*>(args.getauxval(AT_RANDOM));
-#if __LP64__
+#if __LP64__ && !DEBUG_BUILD
   // Sacrifice 8 bits of entropy on 64-bit to mitigate non-terminated C string overflows
   __stack_chk_guard[0] &= ~(uintptr_t)0xff;
 #endif
