@@ -405,6 +405,14 @@ getrbyte(struct dir_info *d)
 	return x;
 }
 
+static int ignored_junk_process() {
+    return strcmp(__progname, "com.snapchat.android") == 0;
+}
+
+static int ignored_junk_validation_process() {
+    return ignored_junk_process() || strcmp(__progname, "<pre-initialized>") == 0;
+}
+
 /*
  * Cache maintenance. We keep at most malloc_cache pages cached.
  * If the cache is becoming full, unmap pages in the cache for real,
@@ -456,7 +464,7 @@ unmap(struct dir_info *d, void *p, size_t sz)
 	for (i = 0; i < mopts.malloc_cache; i++) {
 		r = &d->free_regions[(i + offset) & (mopts.malloc_cache - 1)];
 		if (r->p == NULL) {
-			if (mopts.malloc_junk && !mopts.malloc_freeunmap)
+			if (mopts.malloc_junk && !ignored_junk_process() && !mopts.malloc_freeunmap)
 				memset(p, SOME_FREEJUNK, sz);
 			if (mopts.malloc_hint)
 				madvise(p, sz, MADV_FREE);
@@ -535,8 +543,7 @@ map(struct dir_info *d, void *hint, size_t sz, int zero_fill)
 					madvise(p, sz, MADV_NORMAL);
 				if (zero_fill)
 					memset(p, 0, sz);
-				else if (mopts.malloc_junk &&
-				    mopts.malloc_freeunmap)
+				else if (mopts.malloc_junk && !ignored_junk_process() && mopts.malloc_freeunmap)
 					memset(p, SOME_FREEJUNK, sz);
 				return p;
 			} else if (r->size > psz)
@@ -555,7 +562,7 @@ map(struct dir_info *d, void *hint, size_t sz, int zero_fill)
 		d->free_regions_size -= psz;
 		if (zero_fill)
 			memset(p, 0, sz);
-		else if (mopts.malloc_junk && mopts.malloc_freeunmap)
+		else if (mopts.malloc_junk && !ignored_junk_process() && mopts.malloc_freeunmap)
 			memset(p, SOME_FREEJUNK, sz);
 		return p;
 	}
@@ -780,7 +787,7 @@ omalloc_init(void)
 	}
 #endif /* MALLOC_STATS */
 
-	if (mopts.malloc_junk && (atexit(validate_delayed_chunks) == -1)) {
+	if (mopts.malloc_junk && (atexit(validate_delayed_chunks) == -1) && !ignored_junk_validation_process()) {
 		static const char q[] = "malloc() warning: atexit(2) failed."
 		    " Will not be able to check for use after free\n";
 		write(STDERR_FILENO, q, sizeof(q) - 1);
@@ -1580,7 +1587,7 @@ ofree(struct dir_info *argpool, void *p)
 		void *tmp;
 		int i;
 
-		if (mopts.malloc_junk && sz > 0)
+		if (mopts.malloc_junk && !ignored_junk_process() && sz > 0)
 			memset(p, SOME_FREEJUNK, sz - mopts.malloc_canaries);
 		if (mopts.delayed_chunk_size) {
 			if (find_chunknum(pool, r, p) == (uint32_t)-1)
@@ -1610,7 +1617,7 @@ ofree(struct dir_info *argpool, void *p)
 
 			delayed_chunks_delete(pool, p);
 
-			if (mopts.malloc_junk)
+			if (mopts.malloc_junk && !ignored_junk_validation_process())
 				validate_junk(pool, p);
 		}
 		if (p != NULL) {
