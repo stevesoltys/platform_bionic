@@ -724,7 +724,7 @@ omalloc_init(void)
 	 * Default options
 	 */
 	mopts.malloc_canaries = sizeof(void *);
-//	mopts.malloc_junk = 1;
+	mopts.malloc_junk = 1;
 	mopts.malloc_move = 1;
 	mopts.malloc_xmalloc = 1;
 	mopts.malloc_cache = MALLOC_DEFAULT_CACHE;
